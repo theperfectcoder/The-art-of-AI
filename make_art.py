@@ -19,30 +19,31 @@ if sys.platform == "win32" or os.name == 'nt':
     import keyboard
 
 # these can be overriden with prompt file directives, no need to change them here
-PROCESS = "vqgan"       # which AI process to use, default is vqgan
-WIDTH = 512             # output image width, default is 512
-HEIGHT = 512            # output image height, default is 512
-ITERATIONS = 500        # number of times to run, default is 500
-CUTS = 32               # default = 32
-INPUT_IMAGE = ""        # path and filename of starting image, eg: samples/vectors/face_07.png
-SKIP_STEPS = -1         # steps to skip when using init image (DIFFUSION ONLY)
-LEARNING_RATE = 0.1     # default = 0.1 (VQGAN ONLY)
-TRANSFORMER = ""        # needs to be a .yaml and .ckpt file in /checkpoints directory for whatever is specified here, default = vqgan_imagenet_f16_16384 (VQGAN ONLY)
-CLIP_MODEL = ""         # default = ViT-B/32 (VQGAN ONLY)
-OPTIMISER = ""          # default = Adam (VQGAN ONLY)
-D_USE_VITB32 = "yes"    # load VitB32 CLIP model? (DIFFUSION ONLY)
-D_USE_VITB16 = "yes"    # load VitB16 CLIP model? (DIFFUSION ONLY)
-D_USE_VITL14 = "no"     # load VitL14 CLIP model? (DIFFUSION ONLY)
-D_USE_RN101 = "no"      # load RN101 CLIP model? (DIFFUSION ONLY)
-D_USE_RN50 = "yes"      # load RN50 CLIP model? (DIFFUSION ONLY)
-D_USE_RN50x4 = "no"     # load RN50x4 CLIP model? (DIFFUSION ONLY)
-D_USE_RN50x16 = "no"    # load RN50x16 CLIP model? (DIFFUSION ONLY)
-D_USE_RN50x64 = "no"    # load RN50x64 CLIP model? (DIFFUSION ONLY)
+PROCESS = "vqgan"  # which AI process to use, default is vqgan
+WIDTH = 512  # output image width, default is 512
+HEIGHT = 512  # output image height, default is 512
+ITERATIONS = 500  # number of times to run, default is 500
+CUTS = 32  # default = 32
+INPUT_IMAGE = ""  # path and filename of starting image, eg: samples/vectors/face_07.png
+SKIP_STEPS = -1  # steps to skip when using init image (DIFFUSION ONLY)
+LEARNING_RATE = 0.1  # default = 0.1 (VQGAN ONLY)
+TRANSFORMER = ""  # needs to be a .yaml and .ckpt file in /checkpoints directory for whatever is specified here, default = vqgan_imagenet_f16_16384 (VQGAN ONLY)
+CLIP_MODEL = ""  # default = ViT-B/32 (VQGAN ONLY)
+OPTIMISER = ""  # default = Adam (VQGAN ONLY)
+D_USE_VITB32 = "yes"  # load VitB32 CLIP model? (DIFFUSION ONLY)
+D_USE_VITB16 = "yes"  # load VitB16 CLIP model? (DIFFUSION ONLY)
+D_USE_VITL14 = "no"  # load VitL14 CLIP model? (DIFFUSION ONLY)
+D_USE_RN101 = "no"  # load RN101 CLIP model? (DIFFUSION ONLY)
+D_USE_RN50 = "yes"  # load RN50 CLIP model? (DIFFUSION ONLY)
+D_USE_RN50x4 = "no"  # load RN50x4 CLIP model? (DIFFUSION ONLY)
+D_USE_RN50x16 = "no"  # load RN50x16 CLIP model? (DIFFUSION ONLY)
+D_USE_RN50x64 = "no"  # load RN50x64 CLIP model? (DIFFUSION ONLY)
 
 # Prevent threads from printing at same time.
 print_lock = threading.Lock()
 
 gpu_name = get_device_name()
+
 
 # worker thread executes specified shell command
 class Worker(threading.Thread):
@@ -53,7 +54,7 @@ class Worker(threading.Thread):
 
     def run(self):
         # create output folder if it doesn't exist
-        fullfilepath = self.command.split(" -o ",1)[1]
+        fullfilepath = self.command.split(" -o ", 1)[1]
         filepath = fullfilepath.replace(fullfilepath[fullfilepath.rindex('/'):], "")
         Path(filepath).mkdir(parents=True, exist_ok=True)
 
@@ -62,9 +63,9 @@ class Worker(threading.Thread):
         basefilepath = fullfilepath
         while exists(fullfilepath.replace('.png', '.jpg')):
             x += 1
-            fullfilepath = basefilepath.replace(".png","") + '-' + str(x) + ".png"
+            fullfilepath = basefilepath.replace(".png", "") + '-' + str(x) + ".png"
 
-        self.command = self.command.split(" -o ",1)[0] + " -o " + fullfilepath
+        self.command = self.command.split(" -o ", 1)[0] + " -o " + fullfilepath
 
         with print_lock:
             print("Command: " + self.command)
@@ -77,10 +78,10 @@ class Worker(threading.Thread):
         # save generation details as exif metadata
         if exists(fullfilepath):
             pngImage = PngImageFile(fullfilepath)
-            #metadata = PngInfo()
-            #metadata.add_text("VQGAN+CLIP", self.command)
-            #pngImage.save(fullfilepath, pnginfo=metadata)
-            #pngImage = PngImageFile(fullfilepath)
+            # metadata = PngInfo()
+            # metadata.add_text("VQGAN+CLIP", self.command)
+            # pngImage.save(fullfilepath, pnginfo=metadata)
+            # pngImage = PngImageFile(fullfilepath)
 
             # convert to jpg and remove the original png file
             im = pngImage.convert('RGB')
@@ -101,6 +102,7 @@ class Worker(threading.Thread):
         with print_lock:
             print("Worker done.")
         self.callback()
+
 
 # controller manages worker thread(s) and user input
 # TODO change worker_idle to array of bools to manage multiple threads/gpus
@@ -148,8 +150,8 @@ class Controller:
         self.__init_lists(self.suffixes, "suffixes")
 
         if sys.platform == "win32" or os.name == 'nt':
-            #keyboard.on_press_key("f10", lambda _:self.pause_callback())
-            #keyboard.on_press_key("f9", lambda _:self.exit_callback())
+            # keyboard.on_press_key("f10", lambda _:self.pause_callback())
+            # keyboard.on_press_key("f9", lambda _:self.exit_callback())
             keyboard.add_hotkey("ctrl+shift+p", lambda: self.pause_callback())
             keyboard.add_hotkey("ctrl+shift+q", lambda: self.exit_callback())
             keyboard.add_hotkey("ctrl+shift+r", lambda: self.reload_callback())
@@ -182,14 +184,14 @@ class Controller:
                     line = ""
 
                 if len(line) > 0 and found_header:
-                    #print(search_header + ": " + line)
+                    # print(search_header + ": " + line)
                     which_list.append(line)
 
     # returns a random prefix from the prompt file
     def prefix(self):
         prefix = ''
         if len(self.prefixes) > 0:
-            x = random.randint(0, len(self.prefixes)-1)
+            x = random.randint(0, len(self.prefixes) - 1)
             prefix = self.prefixes[x]
         return prefix
 
@@ -197,7 +199,7 @@ class Controller:
     def suffix(self):
         suffix = ''
         if len(self.suffixes) > 0:
-            x = random.randint(0, len(self.suffixes)-1)
+            x = random.randint(0, len(self.suffixes) - 1)
             suffix = self.suffixes[x]
         return suffix
 
@@ -214,17 +216,17 @@ class Controller:
             # otherwise build the command
             else:
                 base = "python " + self.process + ".py" \
-                    + " -s " + str(self.width) + " " + str(self.height) \
-                    + " -i " + str(self.iterations) \
-                    + " -cuts " + str(self.cuts) \
-                    + " -p \""
+                       + " -s " + str(self.width) + " " + str(self.height) \
+                       + " -i " + str(self.iterations) \
+                       + " -cuts " + str(self.cuts) \
+                       + " -p \""
                 base += (self.prefix() + ' ' + subject + ' ' + self.suffix()).strip()
 
                 input_name = self.prompt_file_name.split('/')
-                input_name = input_name[len(input_name)-1]
+                input_name = input_name[len(input_name) - 1]
                 input_name = input_name.split('\\')
-                input_name = input_name[len(input_name)-1]
-                outdir="output/" + str(date.today()) + '-' + slugify(input_name.split('.', 1)[0])
+                input_name = input_name[len(input_name) - 1]
+                outdir = "output/" + str(date.today()) + '-' + slugify(input_name.split('.', 1)[0])
 
                 for style in self.styles:
                     work = base + " | " + style.strip() + "\""
@@ -257,8 +259,8 @@ class Controller:
                         if self.process == "diffusion" and int(self.skip_steps) > -1:
                             work += " -ss " + self.skip_steps
 
-                    #seed = random.randint(100000000000000,999999999999999)
-                    seed = random.randint(1, 2**32) - 1
+                    # seed = random.randint(100000000000000,999999999999999)
+                    seed = random.randint(1, 2 ** 32) - 1
                     name_subj = slugify(subject)
                     name_subj = re.sub(":[-+]?\d*\.?\d+|[-+]?\d+", "", name_subj)
                     name_style = slugify(style)
@@ -276,7 +278,7 @@ class Controller:
         ss = re.search('!(.+?)=', setting_string)
         if ss:
             command = ss.group(1).lower().strip()
-            value = setting_string.split("=",1)[1].strip()
+            value = setting_string.split("=", 1)[1].strip()
 
             # python switch
             if command == 'process':
@@ -353,14 +355,15 @@ class Controller:
                 self.d_use_rn50x64 = value
 
             else:
-                print("\n*** WARNING: prompt file command not recognized: " + command.upper() + " (it will be ignored!) ***\n")
+                print(
+                    "\n*** WARNING: prompt file command not recognized: " + command.upper() + " (it will be ignored!) ***\n")
                 time.sleep(1.5)
 
     # start a new worker thread
     def do_work(self, command):
         self.worker_idle = False
         with print_lock:
-            print("\n\nWorker starting job #" + str(self.jobs_done+1) + ":")
+            print("\n\nWorker starting job #" + str(self.jobs_done + 1) + ":")
         thread = Worker(command, self.on_work_done)
         thread.start()
 
@@ -428,6 +431,7 @@ class TextFile():
     def lines_remaining(self):
         return len(self.lines)
 
+
 # Taken from https://github.com/django/django/blob/master/django/utils/text.py
 # Using here to make filesystem-safe directory names
 def slugify(value, allow_unicode=False):
@@ -440,6 +444,7 @@ def slugify(value, allow_unicode=False):
     value = re.sub(r'[-\s]+', '-', value).strip('-_')
     # added in case of very long filenames due to multiple prompts
     return value[0:180]
+
 
 # entry point
 if __name__ == '__main__':
