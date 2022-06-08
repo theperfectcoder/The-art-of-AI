@@ -38,8 +38,8 @@ pip install transformers keyboard pillow ftfy regex tqdm omegaconf pytorch-light
 
 **[4]** Clone this repository and switch to its directory:
 ```
-git clone https://github.com/rbbrdckybk/ai-art-generator
-cd ai-art-generator
+git clone https://github.com/theperfectcoder/The-art-of-AI
+cd The-art-of-AI
 ```
 Note that Linux users may need single quotes around the URL in the clone command.
 
