@@ -14,8 +14,8 @@
 
 # VQGAN+CLIP settings
 !PROCESS = vqgan
-!WIDTH = 480
-!HEIGHT = 480
+!WIDTH = 384
+!HEIGHT = 384
 !ITERATIONS = 500
 !LEARNING_RATE = 0.1
 !CUTS = 32
@@ -27,26 +27,27 @@
 #a bright red apple
 #a monkey on a motorcycle
 # dark soul
+armenian vibe
 
 # CLIP-guided diffusion settings
 !PROCESS = diffusion
-!WIDTH = 480
-!HEIGHT = 480
-!ITERATIONS = 1000
+!WIDTH = 384
+!HEIGHT = 384
+!ITERATIONS = 600
 !CUTS = 6
 !D_VITB32 = yes
 !D_VITB16 = yes
-!D_VITL14 = yes
-!D_RN101 = yes
+!D_VITL14 = no
+!D_RN101 = no
 !D_RN50 = yes
-!D_RN50x4 = yes
-!D_RN50x16 = yes
-!D_RN50x64 = yes
+!D_RN50x4 = no
+!D_RN50x16 = no
+!D_RN50x64 = no
 !INPUT_IMAGE =
 
 # prompts here will use the CLIP-guided diffusion settings above
 # a shining lighthouse on the shore of a tropical island in a raging storm
-garden
+armenian vibe
 
 # *******************************************************************************
 # styles go here - think of these as directives in how to render the subject
